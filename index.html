@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<!-- saved from url=(0079)file:///C:/Users/danie/Downloads/NN_Powercleaning_ColdCall_Dashboard%20(1).html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N&amp;N Powercleaning — Cold Call Dashboard</title>
+<script src="./N&amp;N Powercleaning — Cold Call Dashboard_files/chart.umd.js.download"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f5f5f4; --bg3: #ededeb;
+    --text: #1a1a1a; --text2: #595959; --text3: #8a8a8a;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --blue: #378ADD; --blue-light: #B5D4F4; --blue-dark: #0C447C;
+    --green: #3B6D11; --green-light: #EAF3DE;
+    --amber: #854F0B; --amber-light: #FAEEDA;
+    --red: #A32D2D; --red-light: #FCEBEB;
+    --gray-light: #F1EFE8; --gray: #5F5E5A;
+    --radius: 8px; --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #252523; --bg3: #2e2e2b;
+      --text: #f0ede8; --text2: #a8a49e; --text3: #6b6761;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --blue-light: #0C447C; --green-light: #173404;
+      --amber-light: #412402; --red-light: #501313;
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); font-size: 14px; }
+  .app { max-width: 1200px; margin: 0 auto; padding: 0 0 40px; }
+
+  /* Header */
+  .header { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .header-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+  .header-right { display: flex; gap: 10px; align-items: center; }
+  .date-display { font-size: 12px; color: var(--text2); background: var(--bg2); padding: 5px 12px; border-radius: var(--radius); border: 0.5px solid var(--border); }
+  .reset-btn { font-size: 12px; padding: 5px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius); background: transparent; color: var(--text2); cursor: pointer; }
+  .reset-btn:hover { background: var(--bg2); }
+
+  /* Layout */
+  .content { padding: 20px 24px; }
+  .section-label { font-size: 11px; font-weight: 600; color: var(--text3); letter-spacing: 0.07em; text-transform: uppercase; margin: 20px 0 8px; }
+  .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+
+  /* Metric cards */
+  .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  .metric-card { background: var(--bg2); border-radius: var(--radius); padding: 14px 16px; }
+  .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 5px; font-weight: 500; }
+  .metric-value { font-size: 28px; font-weight: 600; color: var(--text); line-height: 1; }
+  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .good { color: var(--green) !important; }
+  .warn { color: var(--amber) !important; }
+  .bad { color: var(--red) !important; }
+
+  /* Goals */
+  .goal-row { margin-bottom: 12px; }
+  .goal-row:last-child { margin-bottom: 0; }
+  .goal-label-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+  .goal-bar-bg { background: var(--bg2); border-radius: 99px; height: 7px; }
+  .goal-bar-fill { height: 7px; border-radius: 99px; background: var(--blue); transition: width 0.4s ease; }
+  .goal-bar-fill.complete { background: var(--green); }
+
+  /* Log a call */
+  .log-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .log-form input, .log-form select {
+    font-size: 12px; padding: 6px 10px; border: 0.5px solid var(--border2);
+    border-radius: var(--radius); background: var(--bg); color: var(--text); height: 34px;
+    outline: none;
+  }
+  .log-form input:focus, .log-form select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(55,138,221,0.15); }
+  .log-form input { min-width: 130px; }
+  .log-btn { font-size: 12px; padding: 6px 16px; height: 34px; border: 0.5px solid var(--blue); border-radius: var(--radius); background: var(--blue); color: #fff; cursor: pointer; font-weight: 500; white-space: nowrap; }
+  .log-btn:hover { opacity: 0.88; }
+  .log-table-wrap { max-height: 230px; overflow-y: auto; border-radius: var(--radius); border: 0.5px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th { text-align: left; color: var(--text3); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 12px; background: var(--bg2); position: sticky; top: 0; border-bottom: 0.5px solid var(--border); }
+  tbody td { padding: 8px 12px; border-bottom: 0.5px solid var(--border); color: var(--text); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--bg2); }
+
+  /* Badges */
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+  .b-hot { background: var(--red-light); color: var(--red); }
+  .b-warm { background: var(--amber-light); color: var(--amber); }
+  .b-cold { background: var(--blue-light); color: var(--blue-dark); }
+  .b-booked { background: var(--green-light); color: var(--green); }
+  .b-quote { background: var(--amber-light); color: var(--amber); }
+  .b-cb { background: var(--blue-light); color: var(--blue-dark); }
+  .b-vm { background: var(--gray-light); color: var(--gray); }
+  .b-no { background: var(--bg2); color: var(--text3); border: 0.5px solid var(--border); }
+
+  /* Two col */
+  .two-col { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap: 14px; }
+
+  /* Follow-up queue */
+  .fu-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; gap: 8px; }
+  .fu-item:last-child { border-bottom: none; }
+  .fu-name { font-weight: 600; color: var(--text); }
+  .fu-detail { color: var(--text2); margin-top: 1px; }
+  .due-today { color: var(--red); font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .due-soon { color: var(--amber); font-size: 11px; white-space: nowrap; }
+  .due-ok { color: var(--text3); font-size: 11px; white-space: nowrap; }
+  .fu-done-btn { font-size: 10px; padding: 2px 8px; border: 0.5px solid var(--border2); border-radius: 99px; background: transparent; color: var(--text2); cursor: pointer; white-space: nowrap; }
+  .fu-done-btn:hover { background: var(--green-light); color: var(--green); border-color: var(--green); }
+  .fu-add-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .fu-add-row input, .fu-add-row select { font-size: 11px; padding: 4px 8px; border: 0.5px solid var(--border2); border-radius: var(--radius); background: var(--bg); color: var(--text); height: 28px; }
+  .fu-add-btn { font-size: 11px; padding: 4px 10px; height: 28px; border: 0.5px solid var(--border2); border-radius: var(--radius); background: transparent; color: var(--text); cursor: pointer; }
+  .fu-add-btn:hover { background: var(--bg2); }
+
+  /* Script */
+  .tab-row { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+  .tab { font-size: 12px; padding: 5px 12px; border-radius: var(--radius); border: 0.5px solid transparent; cursor: pointer; color: var(--text2); background: transparent; }
+  .tab.active { background: var(--bg2); color: var(--text); border-color: var(--border); font-weight: 600; }
+  .script-panel { display: none; }
+  .script-panel.visible { display: block; }
+  .script-box { background: var(--bg2); border-radius: var(--radius); padding: 12px 14px; font-size: 12px; line-height: 1.7; color: var(--text2); }
+  .phase { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 12px; margin-bottom: 3px; }
+  .phase:first-child { margin-top: 0; }
+
+  /* Objections */
+  .obj-item { padding: 9px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; }
+  .obj-item:last-child { border-bottom: none; }
+  .obj-q { font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .obj-a { color: var(--text2); line-height: 1.55; }
+
+  /* Checklist */
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+  .check-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; color: var(--text2); }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input[type=checkbox] { margin-top: 2px; flex-shrink: 0; accent-color: var(--blue); width: 14px; height: 14px; cursor: pointer; }
+  .check-item.done span { text-decoration: line-through; color: var(--text3); }
+
+  /* Charts */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* Stats summary */
+  .stats-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+  .stat-mini { background: var(--bg2); border-radius: var(--radius); padding: 10px 14px; text-align: center; }
+  .stat-mini-val { font-size: 20px; font-weight: 600; color: var(--text); }
+  .stat-mini-lbl { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* Tips */
+  .tip-box { background: var(--blue-light); border-left: 3px solid var(--blue); border-radius: 0 var(--radius) var(--radius) 0; padding: 10px 14px; font-size: 12px; color: var(--text2); line-height: 1.6; margin-top: 10px; }
+  .tip-box strong { color: var(--text); }
+
+  /* Save notice */
+  .save-notice { font-size: 11px; color: var(--green); display: none; margin-left: 8px; }
+
+  @media (max-width: 800px) {
+    .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .check-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <div class="header-title">N&amp;N Powercleaning — Cold Call Dashboard</div>
+      <div class="header-sub">Northwest Indiana · Schererville, IL</div>
+    </div>
+    <div class="header-right">
+      <span class="save-notice" id="save-notice">Saved!</span>
+      <span class="date-display" id="date-display">Monday, March 23</span>
+      <button class="reset-btn" onclick="resetDay()">Reset Today</button>
+      <button class="reset-btn" onclick="clearAll()">Clear All Data</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- METRICS -->
+    <div class="section-label">Today's snapshot</div>
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-label">Calls made</div>
+        <div class="metric-value" id="m-calls">0</div>
+        <div class="metric-sub">Goal: 30/day</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Quotes sent</div>
+        <div class="metric-value" id="m-quotes">0</div>
+        <div class="metric-sub">This session</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Conversion rate</div>
+        <div class="metric-value " id="m-conv">—</div>
+        <div class="metric-sub">Calls → quote/booked</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Est. pipeline</div>
+        <div class="metric-value" id="m-pipe">$0</div>
+        <div class="metric-sub">Open quotes × $210 avg</div>
+      </div>
+    </div>
+
+    <!-- GOALS -->
+    <div class="section-label">Daily goals</div>
+    <div class="card">
+      <div class="goal-row">
+        <div class="goal-label-row"><span>Calls made</span><span id="gl-calls">0 / 30</span></div>
+        <div class="goal-bar-bg"><div class="goal-bar-fill" id="gb-calls" style="width:0%"></div></div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-label-row"><span>Voicemails left</span><span id="gl-vm">0 / 10</span></div>
+        <div class="goal-bar-bg"><div class="goal-bar-fill" id="gb-vm" style="width:0%"></div></div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-label-row"><span>Jobs booked</span><span id="gl-booked">0 / 2</span></div>
+        <div class="goal-bar-bg"><div class="goal-bar-fill" id="gb-booked" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- LOG A CALL -->
+    <div class="section-label">Log a call</div>
+    <div class="card">
+      <div class="log-form">
+        <input id="in-name" placeholder="Contact name">
+        <input id="in-phone" placeholder="Phone #" style="width:120px">
+        <input id="in-area" placeholder="Area (e.g. Crown Point)" style="width:160px">
+        <select id="in-result">
+          <option value="">Outcome</option>
+          <option value="booked">Booked job</option>
+          <option value="quote">Quote sent</option>
+          <option value="callback">Callback requested</option>
+          <option value="voicemail">Voicemail</option>
+          <option value="not-interested">Not interested</option>
+          <option value="no-answer">No answer</option>
+        </select>
+        <select id="in-temp">
+          <option value="">Lead temp</option>
+          <option value="hot">Hot</option>
+          <option value="warm">Warm</option>
+          <option value="cold">Cold</option>
+        </select>
+        <input id="in-notes" placeholder="Quick notes" style="width:180px">
+        <button class="log-btn" onclick="addCall()">+ Log Call</button>
+      </div>
+      <div class="log-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th><th>Name</th><th>Phone</th><th>Area</th><th>Outcome</th><th>Temp</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="call-tbody"><tr><td colspan="7" style="color:var(--text3);padding:16px 12px;text-align:center;">No calls logged yet — start dialing!</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top:0">
+
+      <div>
+        <!-- FOLLOW-UP QUEUE -->
+        <div class="section-label">Follow-up queue</div>
+        <div class="card">
+          <div id="fu-list">
+    <div class="fu-item">
+      <div>
+        <div class="fu-name">Sample: Mike T. — Merrillville</div>
+        <div class="fu-detail">Quote sent $225 · house wash</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span class="due-today">Due today</span>
+        <button class="fu-done-btn" onclick="removeFU(1)">Done</button>
+      </div>
+    </div>
+  
+    <div class="fu-item">
+      <div>
+        <div class="fu-name">Sample: Linda K. — Schererville</div>
+        <div class="fu-detail">Callback requested · driveway</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span class="due-soon">Tomorrow</span>
+        <button class="fu-done-btn" onclick="removeFU(2)">Done</button>
+      </div>
+    </div>
+  
+    <div class="fu-item">
+      <div>
+        <div class="fu-name">Sample: Park Mgmt Co.</div>
+        <div class="fu-detail">Quote $480 · commercial lot</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span class="due-ok">In 3 days</span>
+        <button class="fu-done-btn" onclick="removeFU(3)">Done</button>
+      </div>
+    </div>
+  </div>
+          <div class="fu-add-row">
+            <input id="fu-name" placeholder="Name / company" style="width:140px">
+            <input id="fu-detail" placeholder="Service / quote amt" style="width:150px">
+            <select id="fu-due">
+              <option value="today">Due today</option>
+              <option value="tomorrow">Tomorrow</option>
+              <option value="3days">In 3 days</option>
+              <option value="week">This week</option>
+            </select>
+            <button class="fu-add-btn" onclick="addFollowUp()">+ Add</button>
+          </div>
+        </div>
+
+        <!-- WEEKLY CHART -->
+        <div class="section-label">This week — calls vs quotes</div>
+        <div class="card">
+          <div class="chart-wrap" style="height:160px"><canvas id="weekChart" width="621" height="160" style="display: block; box-sizing: border-box; height: 160px; width: 621px;"></canvas></div>
+          <div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--text3);">
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#378ADD;display:inline-block"></span>Calls</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#3B6D11;display:inline-block"></span>Quotes/Booked</span>
+          </div>
+        </div>
+
+        <!-- ALL-TIME STATS -->
+        <div class="section-label">All-time totals</div>
+        <div class="card">
+          <div class="stats-row">
+            <div class="stat-mini"><div class="stat-mini-val" id="at-calls">0</div><div class="stat-mini-lbl">Total calls</div></div>
+            <div class="stat-mini"><div class="stat-mini-val" id="at-booked">0</div><div class="stat-mini-lbl">Jobs booked</div></div>
+            <div class="stat-mini"><div class="stat-mini-val" id="at-rate">—</div><div class="stat-mini-lbl">Booking rate</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <!-- CALL SCRIPT -->
+        <div class="section-label">Call script</div>
+        <div class="card">
+          <div class="tab-row">
+            <button class="tab active" onclick="showTab(&#39;open&#39;,this)">Opener</button>
+            <button class="tab" onclick="showTab(&#39;pitch&#39;,this)">Pitch</button>
+            <button class="tab" onclick="showTab(&#39;close&#39;,this)">Close</button>
+            <button class="tab" onclick="showTab(&#39;vm&#39;,this)">Voicemail</button>
+          </div>
+          <div id="panel-open" class="script-panel visible">
+            <div class="script-box">
+              <div class="phase">Opener</div>
+              <p>"Hi, is this [Name]? Great — my name is [Your Name] with N&amp;N Powercleaning. I'm a local power washing company serving [their area]. I'm not trying to take a lot of your time — I'm just reaching out to see if you've been thinking about getting your driveway, siding, or patio cleaned up this season."</p>
+              <div class="phase">Pause — let them respond</div>
+              <p>"We're booking jobs in [area] right now. Do you have maybe 60 seconds so I can tell you what we offer?"</p>
+            </div>
+          </div>
+          <div id="panel-pitch" class="script-panel">
+            <div class="script-box">
+              <div class="phase">Value pitch</div>
+              <p>"We use professional-grade equipment — not hardware store stuff. We soft wash siding so there's zero risk of damage, and we handle driveways, decks, gutters, the whole exterior. Most jobs take 1–3 hours and the difference is night and day."</p>
+              <div class="phase">Social proof</div>
+              <p>"We've been doing work right in [their neighborhood] — neighbors have been really happy. We always take before &amp; after photos so you see exactly what you're getting."</p>
+              <div class="phase">Price anchor</div>
+              <p>"A typical driveway runs $100–$150. Full house wash is $175–$275 depending on size. We do bundle deals if you want a few things done at once."</p>
+            </div>
+          </div>
+          <div id="panel-close" class="script-panel">
+            <div class="script-box">
+              <div class="phase">Trial close</div>
+              <p>"Does that sound like something you'd want done this season?"</p>
+              <div class="phase">If yes</div>
+              <p>"Great! I just need your address and I'll send a free quote by end of day. What's the best email or text number for you?"</p>
+              <div class="phase">If hesitant</div>
+              <p>"No pressure at all — can I text you our info so you have it handy? We book up fast once the season hits, so good to get in early."</p>
+            </div>
+          </div>
+          <div id="panel-vm" class="script-panel">
+            <div class="script-box">
+              <div class="phase">Voicemail script (keep under 25 sec)</div>
+              <p>"Hi [Name], this is [Your Name] from N&amp;N Powercleaning — local power washing out of Schererville. Reaching out to homeowners in [area] about exterior cleaning this season. We do driveways, siding, decks — all of it. Give me a call at [number], or I'll try you in a couple days. Thanks!"</p>
+              <div class="phase">Rules</div>
+              <p>Say your number slowly. Never leave more than 2 voicemails per contact. Always follow up with a text after.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- OBJECTIONS -->
+        <div class="section-label">Objection handlers</div>
+        <div class="card" style="max-height:280px;overflow-y:auto;">
+          <div class="obj-item">
+            <div class="obj-q">"I'm not interested."</div>
+            <div class="obj-a">"Totally fair — is it bad timing, or something about the service? I just want to make sure I'm not wasting your time in the future."</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-q">"How much does it cost?"</div>
+            <div class="obj-a">"Depends on what you need — driveway is around $100–$150, full house wash $175–$275. I can give you an exact free quote if you share your address."</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-q">"I already have someone."</div>
+            <div class="obj-a">"That's great — if they're doing a good job, stick with them! But if they're ever unavailable, keep our number handy."</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-q">"I'll think about it."</div>
+            <div class="obj-a">"Of course. Can I send you a quick text with our info? And is there a better time to follow up — maybe a week from now?"</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-q">"Are you insured?"</div>
+            <div class="obj-a">"Great question — we carry full general liability insurance. I can send proof of insurance with your quote if you'd like."</div>
+          </div>
+          <div class="obj-item" style="border:none">
+            <div class="obj-q">"Can you just email me something?"</div>
+            <div class="obj-a">"Sure! What's your email? And so I send the right info — is it mainly the driveway, siding, or the full exterior you were thinking about?"</div>
+          </div>
+        </div>
+
+        <!-- PRO TIPS -->
+        <div class="section-label">Pro tips</div>
+        <div class="card">
+          <div class="tip-box"><strong>Best call times:</strong> Tue–Thu, 9–11am and 4–6pm. Avoid Mondays before 10am and Fridays after 3pm.</div>
+          <div class="tip-box" style="margin-top:8px"><strong>The 3-attempt rule:</strong> Try a lead 3 times (call, VM, text) before marking cold. Most people answer on attempt 2 or 3.</div>
+          <div class="tip-box" style="margin-top:8px"><strong>Speed to lead:</strong> Call back web inquiries within 5 minutes. Response speed wins more jobs than price.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="section-label">Pre-session checklist</div>
+    <div class="card">
+      <div class="check-grid" id="checklist">
+    <div class="check-item" id="ci-0">
+      <input type="checkbox" id="chk-0" onchange="toggleCheck(0,this)">
+      <span>Call list / leads ready</span>
+    </div>
+  
+    <div class="check-item" id="ci-1">
+      <input type="checkbox" id="chk-1" onchange="toggleCheck(1,this)">
+      <span>Pricing sheet open</span>
+    </div>
+  
+    <div class="check-item" id="ci-2">
+      <input type="checkbox" id="chk-2" onchange="toggleCheck(2,this)">
+      <span>N&amp;N email open for quick quotes</span>
+    </div>
+  
+    <div class="check-item" id="ci-3">
+      <input type="checkbox" id="chk-3" onchange="toggleCheck(3,this)">
+      <span>Google Maps ready for area lookups</span>
+    </div>
+  
+    <div class="check-item" id="ci-4">
+      <input type="checkbox" id="chk-4" onchange="toggleCheck(4,this)">
+      <span>Phone charged &amp; headset connected</span>
+    </div>
+  
+    <div class="check-item" id="ci-5">
+      <input type="checkbox" id="chk-5" onchange="toggleCheck(5,this)">
+      <span>Notepad for between-call notes</span>
+    </div>
+  
+    <div class="check-item" id="ci-6">
+      <input type="checkbox" id="chk-6" onchange="toggleCheck(6,this)">
+      <span>Script reviewed (opener, pitch, close)</span>
+    </div>
+  
+    <div class="check-item" id="ci-7">
+      <input type="checkbox" id="chk-7" onchange="toggleCheck(7,this)">
+      <span>Objections reviewed — ready for pushback</span>
+    </div>
+  
+    <div class="check-item" id="ci-8">
+      <input type="checkbox" id="chk-8" onchange="toggleCheck(8,this)">
+      <span>Water &amp; coffee — stay hydrated</span>
+    </div>
+  
+    <div class="check-item" id="ci-9">
+      <input type="checkbox" id="chk-9" onchange="toggleCheck(9,this)">
+      <span>Daily goal set — aim for 30+ calls</span>
+    </div>
+  </div>
+    </div>
+
+    <!-- OUTCOME CHART -->
+    <div class="section-label">Outcome breakdown (all calls)</div>
+    <div class="card">
+      <div class="chart-wrap" style="height:200px"><canvas id="outcomeChart" width="1110" height="200" style="display: block; box-sizing: border-box; height: 200px; width: 1110px;"></canvas></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'nn_dashboard_v2';
+
+let state = {
+  calls: [],
+  followUps: [
+    { id: 1, name: 'Sample: Mike T. — Merrillville', detail: 'Quote sent $225 · house wash', due: 'today' },
+    { id: 2, name: 'Sample: Linda K. — Schererville', detail: 'Callback requested · driveway', due: 'tomorrow' },
+    { id: 3, name: 'Sample: Park Mgmt Co.', detail: 'Quote $480 · commercial lot', due: '3days' },
+  ],
+  allTimeCalls: 0,
+  allTimeBooked: 0,
+  weekData: { Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0, Sun:0 },
+  weekQuotes: { Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0, Sun:0 },
+  nextFuId: 4,
+};
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const n = document.getElementById('save-notice');
+  n.style.display = 'inline';
+  setTimeout(() => n.style.display = 'none', 1500);
+}
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try { state = { ...state, ...JSON.parse(raw) }; } catch(e) {}
+  }
+}
+
+const outcomeMap = {
+  booked: { label: 'Booked', badgeClass: 'b-booked' },
+  quote: { label: 'Quote sent', badgeClass: 'b-quote' },
+  callback: { label: 'Callback', badgeClass: 'b-cb' },
+  voicemail: { label: 'Voicemail', badgeClass: 'b-vm' },
+  'not-interested': { label: 'Not interested', badgeClass: 'b-no' },
+  'no-answer': { label: 'No answer', badgeClass: 'b-no' },
+};
+const tempMap = {
+  hot: '<span class="badge b-hot">Hot</span>',
+  warm: '<span class="badge b-warm">Warm</span>',
+  cold: '<span class="badge b-cold">Cold</span>',
+};
+
+function getToday() {
+  const d = new Date();
+  return d.toISOString().split('T')[0];
+}
+
+function todayCalls() { return state.calls.filter(c => c.date === getToday()); }
+
+function addCall() {
+  const name = document.getElementById('in-name').value.trim();
+  const phone = document.getElementById('in-phone').value.trim();
+  const area = document.getElementById('in-area').value.trim();
+  const result = document.getElementById('in-result').value;
+  const temp = document.getElementById('in-temp').value;
+  const notes = document.getElementById('in-notes').value.trim();
+  if (!name || !result) { alert('Please enter a name and select an outcome.'); return; }
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayKey = dayNames[now.getDay()];
+  state.calls.unshift({ name, phone, area, result, temp, notes, time, date: getToday(), dayKey });
+  state.allTimeCalls++;
+  if (result === 'booked') state.allTimeBooked++;
+  if (state.weekData[dayKey] !== undefined) state.weekData[dayKey]++;
+  if ((result === 'booked' || result === 'quote') && state.weekQuotes[dayKey] !== undefined) state.weekQuotes[dayKey]++;
+  ['in-name','in-phone','in-area','in-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('in-result').value = '';
+  document.getElementById('in-temp').value = '';
+  renderAll();
+  saveState();
+}
+
+function renderCallLog() {
+  const tbody = document.getElementById('call-tbody');
+  const tc = todayCalls();
+  if (tc.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);padding:16px 12px;text-align:center;">No calls logged yet — start dialing!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = tc.slice(0, 50).map(c => {
+    const om = outcomeMap[c.result] || { label: c.result, badgeClass: 'b-no' };
+    return `<tr>
+      <td style="color:var(--text3)">${c.time}</td>
+      <td style="font-weight:600">${c.name}</td>
+      <td style="color:var(--text2)">${c.phone || '—'}</td>
+      <td>${c.area || '—'}</td>
+      <td><span class="badge ${om.badgeClass}">${om.label}</span></td>
+      <td>${tempMap[c.temp] || '<span style="color:var(--text3)">—</span>'}</td>
+      <td style="color:var(--text2);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.notes || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateMetrics() {
+  const tc = todayCalls();
+  const calls = tc.length;
+  const quotes = tc.filter(c => c.result === 'quote' || c.result === 'booked').length;
+  const vms = tc.filter(c => c.result === 'voicemail').length;
+  const booked = tc.filter(c => c.result === 'booked').length;
+  const openQuotes = tc.filter(c => c.result === 'quote').length;
+
+  document.getElementById('m-calls').textContent = calls;
+  document.getElementById('m-quotes').textContent = quotes;
+  const rate = calls > 0 ? Math.round(quotes / calls * 100) : null;
+  const convEl = document.getElementById('m-conv');
+  convEl.textContent = rate !== null ? rate + '%' : '—';
+  convEl.className = 'metric-value ' + (rate === null ? '' : rate >= 15 ? 'good' : rate >= 8 ? 'warn' : 'bad');
+  document.getElementById('m-pipe').textContent = '$' + (openQuotes * 210).toLocaleString();
+
+  const pct = v => Math.min(100, Math.round(v));
+  const cp = pct(calls / 30 * 100);
+  const vp = pct(vms / 10 * 100);
+  const bp = pct(booked / 2 * 100);
+  document.getElementById('gl-calls').textContent = calls + ' / 30';
+  document.getElementById('gb-calls').style.width = cp + '%';
+  document.getElementById('gb-calls').className = 'goal-bar-fill' + (cp >= 100 ? ' complete' : '');
+  document.getElementById('gl-vm').textContent = vms + ' / 10';
+  document.getElementById('gb-vm').style.width = vp + '%';
+  document.getElementById('gb-vm').className = 'goal-bar-fill' + (vp >= 100 ? ' complete' : '');
+  document.getElementById('gl-booked').textContent = booked + ' / 2';
+  document.getElementById('gb-booked').style.width = bp + '%';
+  document.getElementById('gb-booked').className = 'goal-bar-fill' + (bp >= 100 ? ' complete' : '');
+
+  document.getElementById('at-calls').textContent = state.allTimeCalls;
+  document.getElementById('at-booked').textContent = state.allTimeBooked;
+  const ar = state.allTimeCalls > 0 ? Math.round(state.allTimeBooked / state.allTimeCalls * 100) + '%' : '—';
+  document.getElementById('at-rate').textContent = ar;
+}
+
+function renderFollowUps() {
+  const el = document.getElementById('fu-list');
+  if (state.followUps.length === 0) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:10px 0">No follow-ups queued. Add one below.</div>';
+    return;
+  }
+  const dueClass = { today: 'due-today', tomorrow: 'due-soon', '3days': 'due-ok', week: 'due-ok' };
+  const dueLabel = { today: 'Due today', tomorrow: 'Tomorrow', '3days': 'In 3 days', week: 'This week' };
+  el.innerHTML = state.followUps.map(fu => `
+    <div class="fu-item">
+      <div>
+        <div class="fu-name">${fu.name}</div>
+        <div class="fu-detail">${fu.detail}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span class="${dueClass[fu.due] || 'due-ok'}">${dueLabel[fu.due] || fu.due}</span>
+        <button class="fu-done-btn" onclick="removeFU(${fu.id})">Done</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addFollowUp() {
+  const name = document.getElementById('fu-name').value.trim();
+  const detail = document.getElementById('fu-detail').value.trim();
+  const due = document.getElementById('fu-due').value;
+  if (!name) return;
+  state.followUps.push({ id: state.nextFuId++, name, detail: detail || '—', due });
+  document.getElementById('fu-name').value = '';
+  document.getElementById('fu-detail').value = '';
+  renderFollowUps();
+  saveState();
+}
+
+function removeFU(id) {
+  state.followUps = state.followUps.filter(f => f.id !== id);
+  renderFollowUps();
+  saveState();
+}
+
+const checkItems = [
+  'Call list / leads ready',
+  'Pricing sheet open',
+  'N&N email open for quick quotes',
+  'Google Maps ready for area lookups',
+  'Phone charged & headset connected',
+  'Notepad for between-call notes',
+  'Script reviewed (opener, pitch, close)',
+  'Objections reviewed — ready for pushback',
+  'Water & coffee — stay hydrated',
+  'Daily goal set — aim for 30+ calls',
+];
+function buildChecklist() {
+  const el = document.getElementById('checklist');
+  el.innerHTML = checkItems.map((item, i) => `
+    <div class="check-item" id="ci-${i}">
+      <input type="checkbox" id="chk-${i}" onchange="toggleCheck(${i},this)" />
+      <span>${item}</span>
+    </div>
+  `).join('');
+}
+function toggleCheck(i, cb) {
+  document.getElementById('ci-'+i).classList.toggle('done', cb.checked);
+}
+
+let weekChart, outcomeChart;
+function buildCharts() {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const callData = days.map(d => state.weekData[d] || 0);
+  const quoteData = days.map(d => state.weekQuotes[d] || 0);
+
+  if (weekChart) weekChart.destroy();
+  weekChart = new Chart(document.getElementById('weekChart'), {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [
+        { label: 'Calls', data: callData, backgroundColor: '#B5D4F4', borderRadius: 4 },
+        { label: 'Quotes/Booked', data: quoteData, backgroundColor: '#3B6D11', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } },
+        y: { grid: { color: 'rgba(128,128,128,0.1)' }, ticks: { font: { size: 11 }, color: '#888', stepSize: 5 }, beginAtZero: true }
+      }
+    }
+  });
+
+  const outcomes = ['booked','quote','callback','voicemail','not-interested','no-answer'];
+  const labels = ['Booked','Quote sent','Callback','Voicemail','Not interested','No answer'];
+  const colors = ['#3B6D11','#854F0B','#378ADD','#888780','#A32D2D','#B4B2A9'];
+  const counts = outcomes.map(o => state.calls.filter(c => c.result === o).length);
+  const total = counts.reduce((a,b) => a+b, 0);
+
+  if (outcomeChart) outcomeChart.destroy();
+  outcomeChart = new Chart(document.getElementById('outcomeChart'), {
+    type: 'doughnut',
+    data: {
+      labels: labels.map((l,i) => l + ' (' + counts[i] + ')'),
+      datasets: [{ data: total > 0 ? counts : [1], backgroundColor: total > 0 ? colors : ['#e0e0e0'], borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { font: { size: 12 }, color: '#888', padding: 12, boxWidth: 12, boxHeight: 12 }
+        }
+      }
+    }
+  });
+}
+
+function showTab(id, btn) {
+  ['open','pitch','close','vm'].forEach(p => {
+    document.getElementById('panel-'+p).classList.toggle('visible', p === id);
+  });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function renderAll() {
+  renderCallLog();
+  updateMetrics();
+  renderFollowUps();
+  buildCharts();
+}
+
+function resetDay() {
+  if (!confirm('Reset today\'s session? All-time totals are kept.')) return;
+  state.calls = state.calls.filter(c => c.date !== getToday());
+  renderAll();
+  saveState();
+}
+
+function clearAll() {
+  if (!confirm('Clear ALL data including all-time stats? This cannot be undone.')) return;
+  state = {
+    calls: [], followUps: [], allTimeCalls: 0, allTimeBooked: 0,
+    weekData: { Mon:0,Tue:0,Wed:0,Thu:0,Fri:0,Sat:0,Sun:0 },
+    weekQuotes: { Mon:0,Tue:0,Wed:0,Thu:0,Fri:0,Sat:0,Sun:0 },
+    nextFuId: 1,
+  };
+  renderAll();
+  saveState();
+}
+
+// Init
+document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+loadState();
+buildChecklist();
+renderAll();
+</script>
+
+
+</body></html>
